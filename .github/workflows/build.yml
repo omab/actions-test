@@ -42,10 +42,12 @@ jobs:
 
       - name: Prepare ssh-key
         env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_KEY_PRIVATE: ${{ secrets.SSH_KEY_PRIVATE }}
+          SSH_KEY_PUBLIC: ${{ secrets.SSH_KEY_PUBLIC }}
         run: |
-          echo "${SSH_KEY}" > ${HOME}/.ssh-key
-          chmod 600 ${HOME}/.ssh-key
+          echo "${SSH_KEY_PRIVATE}" > ${HOME}/.ssh-key
+          echo "${SSH_KEY_PUBLIC}" > ${HOME}/.ssh-key.pub
+          chmod 600 ${HOME}/.ssh-key ${HOME}/.ssh-key.pub
 
       - name: Copy deployment files
         env:
