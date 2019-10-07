@@ -19,16 +19,14 @@ jobs:
         run: |
           docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
 
-      - name: Print vars
-        run: |
-          export TAG=`echo $GITHUB_REF | awk -F/ '{print $3}'`
-
       - name: Build docker image
         run: |
           cd ${GITHUB_WORKSPACE}
+          export TAG=`echo $GITHUB_REF | awk -F/ '{print $3}'`
           TAG=${TAG:-latest} docker-compose build
 
       - name: Push docker image
         run: |
           cd ${GITHUB_WORKSPACE}
+          export TAG=`echo $GITHUB_REF | awk -F/ '{print $3}'`
           TAG=${TAG:-latest} docker-compose push
