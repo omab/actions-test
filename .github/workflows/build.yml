@@ -21,14 +21,14 @@ jobs:
 
       - name: Print vars
         run: |
-          echo "REF: $GITHUB_REF"
+          export $TAG=`echo $GITHUB_REF | awk -F/ '{print $3}'`
 
       - name: Build docker image
         run: |
           cd ${GITHUB_WORKSPACE}
-          TAG=${GITHUB_REF:-latest} docker-compose build
+          TAG=${TAG:-latest} docker-compose build
 
       - name: Push docker image
         run: |
           cd ${GITHUB_WORKSPACE}
-          TAG=${GITHUB_REF:-latest} docker-compose push
+          TAG=${TAG:-latest} docker-compose push
