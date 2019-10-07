@@ -22,11 +22,39 @@ jobs:
       - name: Build docker image
         run: |
           cd ${GITHUB_WORKSPACE}
-          export TAG=`echo $GITHUB_REF | awk -F/ '{print $3}'`
+          export TAG=`echo ${GITHUB_REF} | awk -F/ '{print $3}'`
           TAG=${TAG:-latest} docker-compose build
 
       - name: Push docker image
         run: |
           cd ${GITHUB_WORKSPACE}
-          export TAG=`echo $GITHUB_REF | awk -F/ '{print $3}'`
+          export TAG=`echo ${GITHUB_REF} | awk -F/ '{print $3}'`
           TAG=${TAG:-latest} docker-compose push
+
+  deploy:
+    name: Build images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Prepare ssh-key
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          echo "${SSH_KEY}" > ${HOME}/.ssh-key
+
+      - name: Copy deployment files
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          scp -i ${HOME}/.ssh-key docker-compose.yml "${SSH_USER}@${DEPLOY_HOST}:"
+          ssh -i ${HOME}/.ssh-key "${SSH_USER}@${DEPLOY_HOST}" <<EOF
+            docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"
+            docker stack deploy -c docker-compose.yml --prune --with-registry-auth actions_test
+            rm docker-compose.yml
+          EOF
