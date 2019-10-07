@@ -53,11 +53,18 @@ jobs:
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          scp -o "StrictHostKeyChecking no" -i ${HOME}/.ssh-key docker-compose.yml "${SSH_USER}@${DEPLOY_HOST}:"
+
+      - name: Deploy stack
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: |
           cd ${GITHUB_WORKSPACE}
-          scp -o "StrictHostKeyChecking no" -i ${HOME}/.ssh-key docker-compose.yml "${SSH_USER}@${DEPLOY_HOST}:"
           ssh -o "StrictHostKeyChecking no" -i ${HOME}/.ssh-key "${SSH_USER}@${DEPLOY_HOST}" <<EOF
             docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"
             docker stack deploy -c docker-compose.yml --prune --with-registry-auth actions_test
