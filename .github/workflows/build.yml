@@ -32,7 +32,7 @@ jobs:
           TAG=${TAG:-latest} docker-compose push
 
   deploy:
-    name: Build images
+    name: Deploy application
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
