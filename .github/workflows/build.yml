@@ -21,21 +21,12 @@ jobs:
         run: |
           docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
 
-      - name: Fetch and save latest tag
-        run: |
-          cd ${GITHUB_WORKSPACE}
-          LAST_TAG=$(git rev-list --tags --max-count=1)
-          CURRENT_TAG=$(git tag --contains "${LAST_TAG}" | sort | tail -1)
-          echo "${CURRENT_TAG}" > version
-
       - name: Build docker image
         run: |
           cd ${GITHUB_WORKSPACE}
-          export CURRENT_TAG=`cat version`
-          TAG=${CURRENT_TAG:-latest} docker-compose build
+          TAG=${GITHUB_REF:-latest} docker-compose build
 
       - name: Push docker image
         run: |
           cd ${GITHUB_WORKSPACE}
-          export CURRENT_TAG=`cat version`
-          TAG=${CURRENT_TAG:-latest} docker-compose push
+          TAG=${GITHUB_REF:-latest} docker-compose push
