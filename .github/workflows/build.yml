@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-        with:
-          ref: master
 
       - name: Docker login
         env:
@@ -20,6 +18,10 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: |
           docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
+
+      - name: Print vars
+        run: |
+          echo "REF: $GITHUB_REF"
 
       - name: Build docker image
         run: |
