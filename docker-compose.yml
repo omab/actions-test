@@ -10,3 +10,11 @@ services:
       - "5000:5000"
     expose:
       - 5000
+    deploy:
+      mode: replicated
+      replicas: 4
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
