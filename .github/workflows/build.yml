@@ -33,7 +33,7 @@ jobs:
 
   deploy:
     name: Deploy application
-    neds:
+    needs:
       - build
     runs-on: ubuntu-latest
     steps:
