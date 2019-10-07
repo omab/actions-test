@@ -1,9 +1,6 @@
 name: CI / CD Action
 
-on:
-  push:
-    branches:
-      - master
+on: release
 
 jobs:
   build:
