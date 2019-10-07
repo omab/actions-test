@@ -45,6 +45,7 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
           echo "${SSH_KEY}" > ${HOME}/.ssh-key
+          chmod 600 ${HOME}/.ssh-key
 
       - name: Copy deployment files
         env:
