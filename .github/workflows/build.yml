@@ -33,6 +33,8 @@ jobs:
 
   deploy:
     name: Deploy application
+    neds:
+      - build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -52,8 +54,8 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: |
           cd ${GITHUB_WORKSPACE}
-          scp -i ${HOME}/.ssh-key docker-compose.yml "${SSH_USER}@${DEPLOY_HOST}:"
-          ssh -i ${HOME}/.ssh-key "${SSH_USER}@${DEPLOY_HOST}" <<EOF
+          scp -o "StrictHostKeyChecking no" -i ${HOME}/.ssh-key docker-compose.yml "${SSH_USER}@${DEPLOY_HOST}:"
+          ssh -o "StrictHostKeyChecking no" -i ${HOME}/.ssh-key "${SSH_USER}@${DEPLOY_HOST}" <<EOF
             docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"
             docker stack deploy -c docker-compose.yml --prune --with-registry-auth actions_test
             rm docker-compose.yml
