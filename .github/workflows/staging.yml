@@ -2,7 +2,7 @@ name: Staging
 
 on:
   release:
-    types: [created]
+    types: [drafted]
 
 jobs:
   build:
