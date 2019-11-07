@@ -2,7 +2,10 @@ name: Staging
 
 on:
   release:
-    types: [unpublished]
+    types:
+      - unpublished
+      - created
+      - prereleased
 
 jobs:
   build:
