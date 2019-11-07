@@ -23,8 +23,8 @@ staging-push:
 
 staging-deploy:
 	@ scp docker-compose.yml "${DEPLOY_HOST}:"
-	@ ssh ${SERVER} "( \
-		docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"; \
+	@ ssh ${DEPLOY_HOST} "( \
+		docker login -u '${DOCKERHUB_USER}' -p '${DOCKERHUB_PASSWORD}'; \
 		ENVIRONMENT=${ENVIRONMENT} docker stack deploy \
 			-c docker-compose.yml \
 			--prune \
@@ -43,8 +43,8 @@ production-push:
 
 production-deploy:
 	@ scp docker-compose.yml "${DEPLOY_HOST}:"
-	@ ssh ${SERVER} "( \
-		docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"; \
+	@ ssh ${DEPLOY_HOST} "( \
+		docker login -u '${DOCKERHUB_USER}' -p '${DOCKERHUB_PASSWORD}'; \
 		ENVIRONMENT=${ENVIRONMENT} docker stack deploy \
 			-c docker-compose.yml \
 			--prune \
