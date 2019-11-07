@@ -54,7 +54,7 @@ jobs:
             HashKnownHosts no
             ForwardAgent no
             StrictHostKeyChecking no
-            IdentityFile ~/.ssh/ssh-key
+            IdentityFile ${HOME}/.ssh/ssh-key
           EOF
 
       - name: Deploy stack
