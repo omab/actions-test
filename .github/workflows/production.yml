@@ -2,7 +2,7 @@ name: Production
 
 on:
   release:
-    types: [published, '!prereleased']
+    types: [published]
 
 jobs:
   deploy:
@@ -17,6 +17,10 @@ jobs:
       DEPLOY_HOST: ${{ secrets.PRODUCTION_DEPLOY_HOST }}
       SSH_USER: ${{ secrets.PRODUCTION_SSH_USER }}
     steps:
+      - name: Pre-release check
+        run: exit 0
+        if: github.event.action == 'prereleased'
+
       - name: Checkout
         uses: actions/checkout@v1
 
