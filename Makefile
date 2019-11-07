@@ -31,3 +31,23 @@ staging-deploy:
 			--with-registry-auth \
 			actions_test; \
 	)"
+
+################################################################################
+# Production
+
+production-build:
+	@ ENVIRONMENT=staging TAG=`$(MAKE) _tag` $(MAKE) _build
+
+production-push:
+	@ ENVIRONMENT=staging TAG=`$(MAKE) _tag` $(MAKE) _push
+
+production-deploy:
+	@ scp docker-compose.yml "${DEPLOY_HOST}:"
+	@ ssh ${SERVER} "( \
+		docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"; \
+		ENVIRONMENT=${ENVIRONMENT} docker stack deploy \
+			-c docker-compose.yml \
+			--prune \
+			--with-registry-auth \
+			actions_test; \
+	)"

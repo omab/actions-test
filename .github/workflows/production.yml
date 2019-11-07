@@ -1,0 +1,43 @@
+name: Production
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Deploy application
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: "production"
+      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      DEPLOY_HOST: ${{ secrets.PRODUCTION_DEPLOY_HOST }}
+      SSH_USER: ${{ secrets.PRODUCTION_SSH_USER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Prepare ssh-key
+        env:
+          SSH_KEY_PRIVATE: ${{ secrets.SSH_KEY_PRIVATE }}
+          SSH_KEY_PUBLIC: ${{ secrets.SSH_KEY_PUBLIC }}
+        run: |
+          mkdir ${HOME}/.ssh
+          echo "${SSH_KEY_PRIVATE}" > ${HOME}/.ssh-key
+          echo "${SSH_KEY_PUBLIC}" > ${HOME}/.ssh-key.pub
+          chmod 600 ${HOME}/.ssh-key ${HOME}/.ssh-key.pub
+          cat <<EOF > ${HOME}/.ssh/config
+          Host ${DEPLOY_HOST}
+            User ${SSH_USER}
+            HashKnownHosts no
+            ForwardAgent no
+            StrictHostKeyChecking no
+            IdentityFile ~/.ssh/ssh-key
+          EOF
+
+      - name: Deploy stack
+        run: |
+          make production-deploy
