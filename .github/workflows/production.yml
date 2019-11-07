@@ -21,8 +21,10 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v1
+        if: github.event.action != 'prereleased'
 
       - name: Prepare ssh-key
+        if: github.event.action != 'prereleased'
         env:
           SSH_KEY_PRIVATE: ${{ secrets.SSH_KEY_PRIVATE }}
           SSH_KEY_PUBLIC: ${{ secrets.SSH_KEY_PUBLIC }}
@@ -41,5 +43,6 @@ jobs:
           EOF
 
       - name: Deploy stack
+        if: github.event.action != 'prereleased'
         run: |
           make production-deploy
