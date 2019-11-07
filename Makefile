@@ -7,7 +7,7 @@ _build: _login
 	@ TAG=${TAG:-latest} docker-compose build
 
 _push: _login
-	@ TAG=${TAG:-latest} docker-compose -f docker-compose.build.yml push
+	@ TAG=${TAG:-latest} docker-compose -f docker-compose.yml push
 
 _tag:
 	@ git describe --tags --abbrev=0
