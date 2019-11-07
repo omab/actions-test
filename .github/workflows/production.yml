@@ -7,8 +7,6 @@ on:
 jobs:
   deploy:
     name: Deploy application
-    needs:
-      - build
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: "production"
