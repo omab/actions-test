@@ -23,7 +23,7 @@ staging-push:
 
 staging-deploy:
 	@ scp docker-compose.yml "${DEPLOY_HOST}:"
-	@ ssh ${DEPLOY_HOST} "( \
+	@ ENVIRONMENT=staging ssh ${DEPLOY_HOST} "( \
 		docker login -u '${DOCKERHUB_USER}' -p '${DOCKERHUB_PASSWORD}'; \
 		ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} docker stack deploy \
 			-c docker-compose.yml \
@@ -36,14 +36,14 @@ staging-deploy:
 # Production
 
 production-build:
-	@ ENVIRONMENT=production TAG=`$(MAKE) _tag` $(MAKE) _build
+	@ ENVIRONMENT=production $(MAKE) _build
 
 production-push:
-	@ ENVIRONMENT=production TAG=`$(MAKE) _tag` $(MAKE) _push
+	@ ENVIRONMENT=production $(MAKE) _push
 
 production-deploy:
 	@ scp docker-compose.yml "${DEPLOY_HOST}:"
-	@ ENVIRONMENT=production TAG=`${MAKE} _tag` ssh ${DEPLOY_HOST} "( \
+	@ ENVIRONMENT=production ssh ${DEPLOY_HOST} "( \
 		docker login -u '${DOCKERHUB_USER}' -p '${DOCKERHUB_PASSWORD}'; \
 		ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} docker stack deploy \
 			-c docker-compose.yml \
