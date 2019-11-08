@@ -21,7 +21,7 @@ jobs:
 
       - name: Debug
         run: |
-          echo "${{ github.event.action }}"
+          echo "${{ github.event.prereleased }}"
           exit 1
 
       - name: Checkout
