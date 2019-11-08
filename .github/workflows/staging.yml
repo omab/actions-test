@@ -1,8 +1,8 @@
 name: Staging
 
 on:
-  release:
-    types: [prereleased]
+  push:
+    branches: [master]
 
 jobs:
   build:
@@ -12,6 +12,7 @@ jobs:
       DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
       ENVIRONMENT: "staging"
+      TAG: "latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -30,11 +31,12 @@ jobs:
       - build
     runs-on: ubuntu-latest
     env:
-      ENVIRONMENT: "staging"
-      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
       DEPLOY_HOST: ${{ secrets.STAGING_DEPLOY_HOST }}
       SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      ENVIRONMENT: "staging"
+      TAG: "latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v1

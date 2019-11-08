@@ -16,16 +16,16 @@ _tag:
 # Staging
 
 staging-build:
-	@ ENVIRONMENT=staging TAG=`$(MAKE) _tag` $(MAKE) _build
+	@ ENVIRONMENT=staging $(MAKE) _build
 
 staging-push:
-	@ ENVIRONMENT=staging TAG=`$(MAKE) _tag` $(MAKE) _push
+	@ ENVIRONMENT=staging $(MAKE) _push
 
 staging-deploy:
 	@ scp docker-compose.yml "${DEPLOY_HOST}:"
 	@ ssh ${DEPLOY_HOST} "( \
 		docker login -u '${DOCKERHUB_USER}' -p '${DOCKERHUB_PASSWORD}'; \
-		ENVIRONMENT=${ENVIRONMENT} docker stack deploy \
+		ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} docker stack deploy \
 			-c docker-compose.yml \
 			--prune \
 			--with-registry-auth \
@@ -36,20 +36,18 @@ staging-deploy:
 # Production
 
 production-build:
-	@ ENVIRONMENT=staging TAG=`$(MAKE) _tag` $(MAKE) _build
+	@ ENVIRONMENT=production TAG=`$(MAKE) _tag` $(MAKE) _build
 
 production-push:
-	@ ENVIRONMENT=staging TAG=`$(MAKE) _tag` $(MAKE) _push
+	@ ENVIRONMENT=production TAG=`$(MAKE) _tag` $(MAKE) _push
 
 production-deploy:
 	@ scp docker-compose.yml "${DEPLOY_HOST}:"
-	@ ssh ${DEPLOY_HOST} "( \
+	@ ENVIRONMENT=production TAG=`${MAKE} _tag` ssh ${DEPLOY_HOST} "( \
 		docker login -u '${DOCKERHUB_USER}' -p '${DOCKERHUB_PASSWORD}'; \
-		ENVIRONMENT=${ENVIRONMENT} docker stack deploy \
+		ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} docker stack deploy \
 			-c docker-compose.yml \
 			--prune \
 			--with-registry-auth \
 			actions_test; \
 	)"
-
-.PHONY: _login

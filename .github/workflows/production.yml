@@ -5,21 +5,37 @@ on:
     types: [published]
 
 jobs:
-  deploy:
-    name: Deploy application
+  build:
+    name: Build images
     runs-on: ubuntu-latest
     env:
-      ENVIRONMENT: "production"
       DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      ENVIRONMENT: "production"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Build docker image
+        run: |
+          make production-build
+
+      - name: Push docker image
+        run: |
+          make production-push
+
+  deploy:
+    name: Deploy application
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    env:
       DEPLOY_HOST: ${{ secrets.PRODUCTION_DEPLOY_HOST }}
       SSH_USER: ${{ secrets.PRODUCTION_SSH_USER }}
+      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      ENVIRONMENT: "production"
     steps:
-      - name: Debug
-        run: |
-          echo "${{ github.event.type }}"
-          exit 1
-
       - name: Checkout
         uses: actions/checkout@v1
 
@@ -29,16 +45,16 @@ jobs:
           SSH_KEY_PUBLIC: ${{ secrets.SSH_KEY_PUBLIC }}
         run: |
           mkdir ${HOME}/.ssh
-          echo "${SSH_KEY_PRIVATE}" > ${HOME}/.ssh-key
-          echo "${SSH_KEY_PUBLIC}" > ${HOME}/.ssh-key.pub
-          chmod 600 ${HOME}/.ssh-key ${HOME}/.ssh-key.pub
+          echo "${SSH_KEY_PRIVATE}" > ${HOME}/.ssh/ssh-key
+          echo "${SSH_KEY_PUBLIC}" > ${HOME}/.ssh/ssh-key.pub
+          chmod 600 ${HOME}/.ssh/ssh-key ${HOME}/.ssh/ssh-key.pub
           cat <<EOF > ${HOME}/.ssh/config
           Host ${DEPLOY_HOST}
             User ${SSH_USER}
             HashKnownHosts no
             ForwardAgent no
             StrictHostKeyChecking no
-            IdentityFile ~/.ssh/ssh-key
+            IdentityFile ${HOME}/.ssh/ssh-key
           EOF
 
       - name: Deploy stack
