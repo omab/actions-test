@@ -15,21 +15,15 @@ jobs:
       DEPLOY_HOST: ${{ secrets.PRODUCTION_DEPLOY_HOST }}
       SSH_USER: ${{ secrets.PRODUCTION_SSH_USER }}
     steps:
-      - name: Pre-release check
-        run: exit 0
-        if: github.event.action == 'prereleased'
-
       - name: Debug
         run: |
-          echo "${{ github.event.action }}"
+          echo "${{ github.event.type }}"
           exit 1
 
       - name: Checkout
         uses: actions/checkout@v1
-        if: github.event.action != 'prereleased'
 
       - name: Prepare ssh-key
-        if: github.event.action != 'prereleased'
         env:
           SSH_KEY_PRIVATE: ${{ secrets.SSH_KEY_PRIVATE }}
           SSH_KEY_PUBLIC: ${{ secrets.SSH_KEY_PUBLIC }}
@@ -48,6 +42,5 @@ jobs:
           EOF
 
       - name: Deploy stack
-        if: github.event.action != 'prereleased'
         run: |
           make production-deploy
