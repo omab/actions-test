@@ -4,10 +4,12 @@ _login:
 		docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"
 
 _build: _login
-	@ docker-compose build
+	@ echo "*************** BUILD: ${TAG}"
+	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} docker-compose build
 
 _push: _login
-	@ docker-compose -f docker-compose.yml push
+	@ echo "*************** PUSH: ${TAG}"
+	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} docker-compose -f docker-compose.yml push
 
 
 ################################################################################
@@ -35,7 +37,6 @@ staging-deploy:
 # Production
 
 production-build:
-	@ echo "TAG: ${TAG}"
 	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} $(MAKE) _build
 
 production-push:
