@@ -18,13 +18,11 @@ jobs:
 
       - name: Build docker image
         run: |
-          export TAG=`echo ${GITHUB_REF} | awk -F/ '{print $3}'`
-          make production-build
+          TAG=`echo ${GITHUB_REF} | awk -F/ '{print $3}'` make production-build
 
       - name: Push docker image
         run: |
-          export TAG=`echo ${GITHUB_REF} | awk -F/ '{print $3}'`
-          make production-push
+          TAG=`echo ${GITHUB_REF} | awk -F/ '{print $3}'` make production-push
 
   deploy:
     name: Deploy application
@@ -61,5 +59,4 @@ jobs:
 
       - name: Deploy stack
         run: |
-          export TAG=`echo ${GITHUB_REF} | awk -F/ '{print $3}'`
-          make production-deploy
+          TAG=`echo ${GITHUB_REF} | awk -F/ '{print $3}'` make production-deploy

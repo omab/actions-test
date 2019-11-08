@@ -4,26 +4,24 @@ _login:
 		docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"
 
 _build: _login
-	@ TAG=${TAG:-latest} docker-compose build
+	@ docker-compose build
 
 _push: _login
-	@ TAG=${TAG:-latest} docker-compose -f docker-compose.yml push
+	@ docker-compose -f docker-compose.yml push
 
-_tag:
-	@ git describe --tags --abbrev=0
 
 ################################################################################
 # Staging
 
 staging-build:
-	@ ENVIRONMENT=staging $(MAKE) _build
+	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} $(MAKE) _build
 
 staging-push:
-	@ ENVIRONMENT=staging $(MAKE) _push
+	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} $(MAKE) _push
 
 staging-deploy:
 	@ scp docker-compose.yml "${DEPLOY_HOST}:"
-	@ ENVIRONMENT=staging ssh ${DEPLOY_HOST} "( \
+	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} ssh ${DEPLOY_HOST} "( \
 		docker login -u '${DOCKERHUB_USER}' -p '${DOCKERHUB_PASSWORD}'; \
 		ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} docker stack deploy \
 			-c docker-compose.yml \
@@ -32,18 +30,19 @@ staging-deploy:
 			actions_test; \
 	)"
 
+
 ################################################################################
 # Production
 
 production-build:
-	@ ENVIRONMENT=production $(MAKE) _build
+	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} $(MAKE) _build
 
 production-push:
-	@ ENVIRONMENT=production $(MAKE) _push
+	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} $(MAKE) _push
 
 production-deploy:
 	@ scp docker-compose.yml "${DEPLOY_HOST}:"
-	@ ENVIRONMENT=production ssh ${DEPLOY_HOST} "( \
+	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} ssh ${DEPLOY_HOST} "( \
 		docker login -u '${DOCKERHUB_USER}' -p '${DOCKERHUB_PASSWORD}'; \
 		ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} docker stack deploy \
 			-c docker-compose.yml \
