@@ -35,6 +35,7 @@ staging-deploy:
 # Production
 
 production-build:
+	@ echo "TAG: ${TAG}"
 	@ ENVIRONMENT=${ENVIRONMENT} TAG=${TAG} $(MAKE) _build
 
 production-push:
