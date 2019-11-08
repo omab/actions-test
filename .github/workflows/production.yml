@@ -19,6 +19,11 @@ jobs:
         run: exit 0
         if: github.event.action == 'prereleased'
 
+      - name: Debug
+        run: |
+          echo "${{ github.event.action }}"
+          exit 1
+
       - name: Checkout
         uses: actions/checkout@v1
         if: github.event.action != 'prereleased'
